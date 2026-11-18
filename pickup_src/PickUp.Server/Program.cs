@@ -38,7 +38,7 @@ builder.Services.AddHostedService<GameClockService>();
 
 var app = builder.Build();
 app.UseForwardedHeaders();
-var webSocketOptions = new WebSocketOptions();
+var webSocketOptions = new Microsoft.AspNetCore.Builder.WebSocketOptions
 foreach (var origin in allowedOrigins) webSocketOptions.AllowedOrigins.Add(origin);
 app.UseWebSockets(webSocketOptions);
 if (!app.Environment.IsDevelopment()) app.UseHsts();
