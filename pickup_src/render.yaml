@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: pickup-online-server
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_HTTP_PORTS
+        value: "10000"
+      - key: AllowedOrigins
+        value: "https://html-classic.itch.zone"

@@ -1,0 +1,1580 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Pick Up Online</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #10091a;
+            --panel: #20122f;
+            --panel2: #2d1942;
+            --edge: #8755b4;
+            --pink: #ff4ee8;
+            --gold: #ffe28b;
+            --muted: #c8b6d8;
+            --green: #65edb0;
+            --red: #ff626f
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(ellipse at 50% -10%,#54266f 0,#21102f 38%,var(--bg) 76%);
+            color: #fff;
+            font: 15px/1.45 "Segoe UI",Arial,sans-serif;
+            min-height: 100vh
+        }
+
+        header {
+            padding: 18px 16px 10px;
+            text-align: center
+        }
+
+        h1 {
+            font-size: clamp(30px,5vw,48px);
+            letter-spacing: .22em;
+            margin: 0;
+            color: #ffd4ff;
+            text-shadow: 0 0 9px #ff40e0,0 0 24px #b21cae
+        }
+
+        header p {
+            color: var(--muted);
+            margin: 4px 0 0
+        }
+
+        main {
+            max-width: 1180px;
+            margin: auto;
+            padding: 10px 16px 34px
+        }
+
+        .panel {
+            background: linear-gradient(145deg,rgba(55,32,76,.96),rgba(27,16,42,.98));
+            border: 1px solid var(--edge);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 12px 0;
+            box-shadow: 0 0 18px #4b1c6530,inset 0 0 22px #9b51b51a
+        }
+
+            .panel h2, .panel h3 {
+                margin: 0 0 12px
+            }
+
+        .setup-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 14px
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+            .row > * {
+                min-width: 0
+            }
+
+        input {
+            background: #120b1c;
+            color: white;
+            border: 1px solid #8c65a9;
+            border-radius: 9px;
+            padding: 11px 12px;
+            font-size: 15px;
+            flex: 1;
+            min-width: 120px
+        }
+
+        button {
+            background: linear-gradient(#9958c5,#65378c);
+            border: 1px solid #c08be0;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 9px;
+            font-weight: 650;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #0005
+        }
+
+            button:hover:not(:disabled) {
+                filter: brightness(1.16)
+            }
+
+            button:disabled {
+                opacity: .38;
+                cursor: not-allowed
+            }
+
+        .primary {
+            background: linear-gradient(#ff69e9,#9e35b7);
+            border-color: #ffc1f6;
+            color: #230c2b
+        }
+
+        .secondary {
+            background: #38234b
+        }
+
+        .status {
+            color: var(--gold);
+            min-height: 24px;
+            margin: 10px 0 0
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        .code {
+            font-size: 22px;
+            letter-spacing: .2em;
+            color: var(--gold);
+            font-weight: 800
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        .game-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .round-pill {
+            background: #160c24;
+            border: 1px solid #8755b4;
+            border-radius: 999px;
+            padding: 8px 13px;
+            color: var(--gold);
+            font-weight: 700
+        }
+
+        .boards {
+            display: grid;
+            grid-template-columns: minmax(0,1.45fr) minmax(250px,.8fr);
+            gap: 14px
+        }
+
+        .timer {
+            font-size: 32px;
+            font-variant-numeric: tabular-nums;
+            color: var(--gold);
+            text-shadow: 0 0 12px #f7a8ff
+        }
+
+        .meter {
+            height: 10px;
+            background: #100a17;
+            border-radius: 99px;
+            overflow: hidden;
+            border: 1px solid #65417c;
+            margin: 7px 0 12px
+        }
+
+            .meter > i {
+                display: block;
+                height: 100%;
+                width: 0;
+                background: linear-gradient(90deg,#e83cce,#ffe48d);
+                transition: width .2s
+            }
+
+        .dice {
+            display: grid;
+            grid-template-columns: repeat(5,minmax(0,1fr));
+            gap: 9px;
+            margin: 14px 0
+        }
+
+        .die {
+            min-height: 104px;
+            border: 2px solid #9d6ac0;
+            border-radius: 13px;
+            background: linear-gradient(145deg,#482a61,#241532);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: 42px;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: inset 0 0 15px #d77dff20
+        }
+
+            .die small {
+                font-size: 11px;
+                color: #ddcce9;
+                letter-spacing: .05em
+            }
+
+            /* Casino-Würfelanimation */
+            .die.rolling {
+                animation: casinoShake 0.12s infinite alternate;
+                border-color: #ffe28b;
+                box-shadow: 0 0 20px #ffcf45, inset 0 0 20px #ffffff55;
+                transform-origin: center;
+            }
+
+            .die.stopping {
+                animation: casinoStop 0.35s ease-out;
+            }
+
+        @keyframes casinoShake {
+            from {
+                transform: translateY(-3px) scale(1.04);
+                filter: brightness(1.5);
+            }
+
+            to {
+                transform: translateY(3px) scale(0.96);
+                filter: brightness(0.8);
+            }
+        }
+
+        @keyframes casinoStop {
+            0% {
+                transform: scale(1.3) rotate(8deg);
+                filter: brightness(2);
+            }
+
+            65% {
+                transform: scale(0.9) rotate(-3deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0);
+                filter: brightness(1);
+            }
+        }
+
+        .die.held {
+            border-color: var(--gold);
+            background: linear-gradient(145deg,#74511f,#342018);
+            box-shadow: 0 0 13px #ffd65c55
+        }
+
+        .die:disabled {
+            cursor: default;
+            opacity: .8
+        }
+
+        .actions {
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap
+        }
+
+        .best {
+            font-size: 25px;
+            color: var(--gold);
+            font-weight: 800
+        }
+
+        .subline {
+            color: var(--muted);
+            min-height: 22px
+        }
+
+        .opponent {
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .player-card {
+            background: #170d24;
+            border: 1px solid #63427a;
+            border-radius: 12px;
+            padding: 12px
+        }
+
+            .player-card .name {
+                font-weight: 800
+            }
+
+            .player-card .big {
+                font-size: 22px;
+                color: var(--gold);
+                font-variant-numeric: tabular-nums
+            }
+
+        .player-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            min-height: 30px;
+        }
+
+            .player-line b {
+                flex-shrink: 0;
+                text-align: right;
+                font-variant-numeric: tabular-nums;
+            }
+
+        .tag {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 99px;
+            background: #50326a;
+            color: #ead9f5
+        }
+
+            .tag.ok {
+                background: #174d3a;
+                color: #a7ffcf
+            }
+
+            .tag.bad {
+                background: #642b39;
+                color: #ffd4d7
+            }
+
+        .finish {
+            font-size: 34px
+        }
+
+        .scoring {
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 10px;
+        }
+
+        .score-tile {
+            background: #170d24;
+            border: 1px solid #57386e;
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+            text-align: left;
+            min-height: 76px;
+            width: 100%;
+        }
+
+            .score-tile b {
+                display: block;
+                color: var(--gold);
+                font-size: 19px;
+                margin-top: 4px;
+            }
+
+            .score-tile small {
+                display: block;
+                color: var(--muted);
+                margin-top: 3px;
+            }
+
+            .score-tile:disabled {
+                opacity: .38;
+                border-color: #493653;
+                cursor: not-allowed;
+                filter: grayscale(.7);
+            }
+
+            .score-tile:not(:disabled):hover {
+                border-color: var(--gold);
+                box-shadow: 0 0 12px #ffd65c44;
+            }
+
+            .score-tile.used {
+                background: #102b0b;
+                border: 2px solid #39FF14;
+                color: #ffffff;
+                opacity: 1;
+                filter: none;
+                box-shadow: 0 0 12px #39FF1480, inset 0 0 12px #39FF1425;
+            }
+
+                .score-tile.used b {
+                    color: #000000;
+                    font-weight: 900;
+                }
+
+                .score-tile.used small {
+                    color: #baffaa;
+                }
+
+        @media(max-width:430px) {
+            .scoring {
+                grid-template-columns: 1fr
+            }
+        }
+
+
+        .final-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(8, 3, 15, 0.88);
+            backdrop-filter: blur(8px);
+        }
+
+            .final-overlay.hidden {
+                display: none !important;
+            }
+
+        .final-card {
+            width: 100%;
+            max-width: 650px;
+            padding: 35px 25px;
+            text-align: center;
+            border: 2px solid #ff4ee8;
+            border-radius: 24px;
+            background: linear-gradient(145deg, #38204f, #160b25);
+            box-shadow: 0 0 35px #ff4ee855;
+        }
+
+        .final-trophy {
+            font-size: 65px;
+            margin-bottom: 8px;
+        }
+
+        .final-card h2 {
+            font-size: clamp(30px, 6vw, 46px);
+            color: #ffe28b;
+            margin: 0;
+            text-shadow: 0 0 18px #ffcf45;
+        }
+
+        .final-subtitle {
+            color: #c8b6d8;
+            margin: 8px 0 25px;
+        }
+
+        .final-winner {
+            font-size: 24px;
+            font-weight: 900;
+            color: #ffe28b;
+            margin-bottom: 22px;
+        }
+
+        .final-player {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 17px;
+            margin: 10px 0;
+            border: 1px solid #8755b4;
+            border-radius: 12px;
+            background: #170d24;
+            font-size: 19px;
+        }
+
+            .final-player.first {
+                border: 2px solid #39FF14;
+                box-shadow: 0 0 16px #39FF1455;
+            }
+
+            .final-player b {
+                color: #ffe28b;
+                font-size: 23px;
+            }
+
+        .final-thanks {
+            color: #c8b6d8;
+            margin: 25px 0 0;
+        }
+
+        footer {
+            text-align: center;
+            color: #9f8cad;
+            font-size: 12px;
+            margin-top: 16px
+        }
+
+        @media(max-width:800px) {
+            .setup-grid, .boards {
+                grid-template-columns: 1fr
+            }
+
+            .dice {
+                gap: 6px
+            }
+
+            .die {
+                min-height: 82px;
+                font-size: 34px
+            }
+
+            .scoring {
+                grid-template-columns: repeat(2,1fr)
+            }
+        }
+
+        @media(max-width:430px) {
+            main {
+                padding: 8px
+            }
+
+            .panel {
+                padding: 12px
+            }
+
+            .dice {
+                grid-template-columns: repeat(5,minmax(0,1fr))
+            }
+
+            .die {
+                min-height: 68px;
+                font-size: 27px
+            }
+
+                .die small {
+                    font-size: 9px
+                }
+
+            .actions button {
+                flex: 1
+            }
+        }
+
+        .round-score-row {
+            background: #170d24;
+            border: 1px solid #8755b4;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+
+        .round-score-equation {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .round-score-value {
+            color: var(--gold);
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .round-score-bonus {
+            color: var(--green);
+            font-weight: 800;
+        }
+        /* Goldenes Konfetti */
+        .gold-confetti-layer {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 99999;
+        }
+
+        .gold-confetti-piece {
+            position: absolute;
+            top: -20px;
+            width: 9px;
+            height: 14px;
+            background: #ffd700;
+            border-radius: 2px;
+            animation: gold-confetti-fall 1.5s linear forwards;
+        }
+
+        @keyframes gold-confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(110vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+    
+
+
+
+</head>
+<body>
+    <header><h1>PICK UP</h1><p>Neon-Tisch · Browser & Windows · gemeinsamer Online-Server</p></header>
+    <main>
+        <section class="panel" id="setupPanel">
+            <h2>Spiel starten oder beitreten</h2>
+            <div class="setup-grid">
+                <div>
+                    <label class="muted" for="playerName">Dein Spielername</label>
+                    <div class="row" style="margin:6px 0 10px"><input id="playerName" maxlength="20" value="Spieler" autocomplete="nickname"></div>
+                    <div class="row"><button class="primary" id="soloBtn">Solo gegen Computer</button><button id="createBtn">Online-Raum erstellen</button></div>
+                    <p class="muted">Solo startet sofort. Beim Online-Spiel erstellt ein Spieler den Raum und teilt den Code.</p>
+                </div>
+                <div>
+                    <label class="muted" for="joinCode">Mit Raumcode beitreten</label>
+                    <div class="row" style="margin:6px 0 10px"><input id="joinCode" maxlength="6" placeholder="z. B. K7M4Q2" autocapitalize="characters"><button id="joinBtn">Beitreten</button></div>
+                    <div id="inviteBox" class="hidden"><span class="muted">Dein Raumcode:</span> <span class="code" id="inviteCode">------</span></div>
+                </div>
+            </div>
+            <div class="row" style="margin-top:12px"><button id="startBtn" class="primary hidden" disabled>Spiel starten</button><button id="leaveBtn" class="secondary hidden">Raum verlassen</button></div>
+            <p class="status" id="status">Verbinde mit dem Spielserver …</p>
+        </section>
+
+        <section id="gamePanel" class="hidden">
+            <div class="panel">
+                <div class="game-head"><div><h2 style="margin:0">Spielübersicht</h2><div class="muted">Raum <b id="roomCodeLabel">—</b> · <span id="modeLabel">Online</span></div></div><div class="round-pill">Runde <span id="roundLabel">1</span>/5 · Ziel <span id="targetLabel">100.000</span></div></div>
+                <div class="muted" id="roundMessage" style="margin-top:9px">Beide Spieler starten gleichzeitig. Jeder hat seine eigene Zeit und Spielfläche.</div>
+                <div id="nextRoundBox" class="hidden" style="margin-top:12px">
+                    <p id="readyMessage" class="muted"></p>
+                    <button id="nextRoundBtn" class="primary">
+                        Nächste Runde starten
+                    </button>
+                </div>
+            </div>
+
+            <div id="roundScoreboard" class="panel hidden">
+                <h2>🏆 Punkteübersicht dieser Runde</h2>
+                <div id="roundScoreboardPlayers"></div>
+            </div>
+
+            <div class="boards">
+                <section class="panel">
+                    <div class="game-head"><h2>Deine Spielfläche</h2><div class="timer" id="timer">03:30</div></div>
+                    <div class="meter"><i id="progress"></i></div>
+                    <div class="player-line">
+                        <span class="muted">Rundenpunkte</span>
+                        <b class="best">
+                            <span id="roundScore">0</span>
+                            <span id="roundProgressText"
+                                  style="font-size:13px;color:var(--muted)">
+                                / 100.000
+                            </span>
+                        </b>
+                    </div>
+
+                    <div class="player-line">
+                        <span class="muted">Gesamtpunkte</span>
+                        <b id="totalScore">0</b>
+                    </div>
+                    <div class="dice" id="diceBoard"></div>
+                    <div class="subline" id="rollInfo">Automatischer Erstwurf · zwei weitere Drehungen</div>
+                    <!--<div class="player-line" style="margin:8px 0"><span class="muted">Beste mögliche Wertung</span><span class="best" id="bestScore">0</span></div>-->
+                    <!--<div class="subline" id="bestDescription">Noch keine gültige Kombination</div>-->
+                    <div class="actions" style="margin-top:13px">
+                        <button id="rerollBtn1" class="primary" disabled>
+                            1. Neudrehung
+                        </button>
+                        <button id="rerollBtn2" class="primary" disabled>
+                            2. Neudrehung
+                        </button>
+                    </div>
+                    <div class="subline" id="lastAction" style="margin-top:10px"></div>
+                    <div class="muted">&lt;3</div>
+                    <div id="finishBanner" class="hidden" style="margin-top:12px">
+                        <span class="finish" id="finishIcon">❌</span>
+                        <b id="finishText">Runde beendet</b>
+                    </div>
+
+                    <!--<div class="subline" id="bestDescription">Noch keine gültige Kombination</div>-->
+                    <div id="targetReachedBanner" class="hidden" style="margin-top:12px">
+                        <span class="finish">🏁</span>
+                        <b>Rundenziel erreicht! Du kannst weiterspielen.</b>
+                    </div>
+                </section>
+                <aside class="panel opponent">
+                    <h2>Gegner & Spielstand</h2>
+                    <div id="opponentCards"></div>
+                    <!--<div class="muted">Der Gegner sieht nur seinen eigenen Wurf. Punkte, Status und Rundentimer werden gemeinsam synchronisiert.</div>-->
+                </aside>
+            </div>
+            <section class="panel">
+                <h3>Deine zwölf Wertungsfelder</h3>
+                <p class="muted">
+                    Wähle nach deinem Wurf genau ein verfügbares Feld aus.
+                    Bereits verwendete Felder sind gesperrt.
+                </p>
+                <div class="scoring" id="scoreFields">
+                    <p class="muted">Warte auf den ersten Wurf …</p>
+                </div>
+                <p class="muted">
+                    🃏 Paar-Joker: zusätzliches Wertungsfeld für jede gültige Kombination.
+                    🎭 Freier Joker: ebenfalls für jede gültige Kombination verwendbar.
+                    Beide Jokerfelder können jeweils einmal pro Runde genutzt werden.
+                    Die fünf Würfel bleiben dabei unverändert.
+                </p>
+            </section>
+        </section>
+
+        <section id="finalScoreboard" class="final-overlay hidden">
+            <div class="final-card">
+                <div class="final-trophy">🏆</div>
+                <h2>SPIEL BEENDET!</h2>
+                <p class="final-subtitle">Das Endergebnis nach 5 Runden</p>
+
+                <div id="finalWinner" class="final-winner"></div>
+                <div id="finalPlayers" class="final-players"></div>
+
+                <button id="restartGameBtn"
+                        class="primary"
+                        style="margin-top:20px;font-size:18px">
+                    🔄 Erneut spielen
+                </button>
+
+                <p id="restartHint" class="muted"></p>
+
+                <p class="final-thanks">Danke fürs Spielen!</p>
+            </div>
+        </section>
+
+        <footer>Pick Up Online · Entwicklungsstand · Räume werden derzeit nur im Arbeitsspeicher des Servers gehalten.</footer>
+    </main>
+    <script src="server-config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js" crossorigin="anonymous"></script>
+    <script>
+        (() => {
+            const $ = id => document.getElementById(id);
+            const faces = ['🍀', '🌙', '❤️', '⭐', '∩', '👑'];
+            const targetValues = [100000, 150000, 175000, 200000, 225000];
+            let connection = null, credentials = null, roomState = null, held = [false, false, false, false, false], receivedAt = Date.now(), lastDiceKey = '', lastRound = 0, lastRollNumber = 0, lastRerollsLeft = -1;
+            let busy = false;
+            let rollingAnimation = false;
+            let rollingInterval = null;
+            let casinoStopTimer = null;
+            let casinoJustStopped = false;
+            let roundScoreboardKey = '';
+            let roundScoreboardTimer = null;
+
+            function startCasinoAnimation() {
+                if (rollingAnimation) return;
+
+                rollingAnimation = true;
+                casinoJustStopped = false;
+
+                document.querySelectorAll('.die').forEach((die, index) => {
+                    if (!held[index]) {
+                        die.classList.add('rolling');
+                    }
+                });
+
+                rollingInterval = setInterval(() => {
+                    document.querySelectorAll('.die').forEach((die, index) => {
+                        if (held[index]) return;
+
+                        const symbol = die.querySelector('.die-symbol');
+
+                        if (symbol) {
+                            symbol.textContent =
+                                faces[Math.floor(Math.random() * faces.length)];
+                        }
+                    });
+                }, 65);
+
+                casinoStopTimer = setTimeout(() => {
+                    clearInterval(rollingInterval);
+                    rollingInterval = null;
+
+                    rollingAnimation = false;
+                    casinoJustStopped = true;
+
+                    render();
+
+                    setTimeout(() => {
+                        document.querySelectorAll('.die.stopping').forEach(die => {
+                            die.classList.remove('stopping');
+                        });
+
+                        casinoJustStopped = false;
+                    }, 400);
+
+                }, 1200);
+            }
+
+            const fmt = n => Number(n || 0).toLocaleString('de-DE');
+            const mmss = n => `${String(Math.floor(Math.max(0, n) / 60)).padStart(2, '0')}:${String(Math.max(0, n) % 60).padStart(2, '0')}`;
+            const setStatus = message => $('status').textContent = message;
+            const newActionId = () => (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); });
+            const saveCredentials = info => {
+                credentials = { code: info.code, token: info.token, playerName: info.playerName };
+                try { sessionStorage.setItem('pickup.credentials', JSON.stringify(credentials)); } catch { }
+                $('joinCode').value = info.code;
+                $('inviteCode').textContent = info.code;
+                $('inviteBox').classList.remove('hidden');
+                $('roomCodeLabel').textContent = info.code;
+            };
+            const clearCredentials = () => { credentials = null; roomState = null; try { sessionStorage.removeItem('pickup.credentials'); } catch { } $('gamePanel').classList.add('hidden'); $('leaveBtn').classList.add('hidden'); $('startBtn').classList.add('hidden'); $('inviteBox').classList.add('hidden'); };
+            async function leaveCurrentRoom() { if (credentials && connection && connection.state === signalR.HubConnectionState.Connected) { try { await connection.invoke('LeaveRoom', credentials.code, credentials.token); } catch { } } clearCredentials(); }
+            const showGame = () => { $('gamePanel').classList.remove('hidden'); $('leaveBtn').classList.remove('hidden'); };
+
+            async function connect() {
+                if (!window.signalR) { setStatus('SignalR-Bibliothek konnte nicht geladen werden. Bitte Internetverbindung prüfen.'); return; }
+                const configuredServer = (window.PICKUP_SERVER_URL || new URLSearchParams(window.location.search).get('server') || '').trim().replace(/\/$/, '');
+                const hubUrl = configuredServer ? `${configuredServer}/gamehub` : '/gamehub';
+                connection = new signalR.HubConnectionBuilder().withUrl(hubUrl).withAutomaticReconnect({ nextRetryDelayInMilliseconds: retry => Math.min(30000, 1000 * Math.pow(2, Math.min(retry.previousRetryCount, 5))) }).build();
+
+                connection.on('RoomState', state => {
+                    if (roomState && state.public.version < roomState.public.version) return;
+
+                    const diceKey = (state.me.dice || []).join(',');
+
+                    const newThrow =
+                        state.public.started &&
+                        state.me.rollNumber > 0 &&
+                        (
+                            diceKey !== lastDiceKey ||
+                            state.me.rollNumber !== lastRollNumber ||
+                            state.public.round !== lastRound
+                        );
+
+                    if (
+                        diceKey !== lastDiceKey ||
+                        state.public.round !== lastRound ||
+                        state.me.rollNumber !== lastRollNumber ||
+                        state.me.rerollsLeft !== lastRerollsLeft
+                    ) {
+                        held = state.me.held.slice();
+                    }
+
+                    lastDiceKey = diceKey;
+                    lastRound = state.public.round;
+                    lastRollNumber = state.me.rollNumber;
+                    lastRerollsLeft = state.me.rerollsLeft;
+
+                    roomState = state;
+                    receivedAt = Date.now();
+
+                    if (newThrow) {
+                        startCasinoAnimation();
+                    }
+
+                    render();
+                });
+
+                connection.on('PublicState', state => { if (roomState && state.code === roomState.public.code && state.version >= roomState.public.version) { roomState.public = state; renderPublic(); } });
+                connection.onreconnecting(() => setStatus('Verbindung unterbrochen – erneuter Verbindungsversuch …'));
+                connection.onreconnected(async () => {
+                    setStatus('Wieder verbunden – Spielstand wird wiederhergestellt …');
+                    if (credentials) {
+                        try { await connection.invoke('RejoinRoom', credentials.code, credentials.token); setStatus('Wieder verbunden. Dein Spielstand wurde geladen.'); }
+                        catch (e) { setStatus('Wiederverbindung fehlgeschlagen: ' + e.message); }
+                    }
+                });
+                connection.onclose(() => setStatus('Verbindung zum Server geschlossen. Seite neu laden, um erneut zu verbinden.'));
+                await connection.start();
+                setStatus('Mit dem Spielserver verbunden.');
+                try {
+                    const stored = sessionStorage.getItem('pickup.credentials');
+                    if (stored) {
+                        const previous = JSON.parse(stored);
+                        if (previous.code && previous.token) {
+                            credentials = previous;
+                            $('playerName').value = previous.playerName || 'Spieler';
+                            await connection.invoke('RejoinRoom', previous.code, previous.token);
+                            setStatus('Vorheriger Raum wiederhergestellt.');
+                            return;
+                        }
+                    }
+                } catch (e) { setStatus('Kein gespeicherter Raum: ' + e.message); }
+            }
+
+            const scoreFieldOrder = [
+                ['Clover', '🍀🍀🍀'],
+                ['Moon', '🌙🌙🌙'],
+                ['Heart', '❤️❤️❤️'],
+                ['Star', '⭐⭐⭐'],
+                ['Horseshoe', '∩∩∩'],
+                ['Crown', '👑👑👑'],
+                ['FourOfKind', 'Vierer'],
+                ['FiveOfKind', 'Fünfer'],
+                ['FullHouse', 'Full House'],
+                ['FiveDifferent', '🍀🌙❤️⭐∩👑'],
+                ['PairJoker', 'Joker'],
+                ['WildJoker', 'Joker']
+            ];
+
+            // Unterstützt sowohl Enum-Namen als auch numerische Enum-Werte.
+            function normalizeField(value) {
+                if (
+                    typeof value === 'number' ||
+                    (typeof value === 'string' && /^\d+$/.test(value))
+                ) {
+                    return scoreFieldOrder[Number(value)]?.[0] ?? String(value);
+                }
+
+                return String(value);
+            }
+
+            function renderScoreFields(me, showPossibilities = true) {
+                console.log("Würfel:", me.dice, "Verfügbare Wertungen:", me.availableFieldScores);
+
+                const container = $('scoreFields');
+                console.log("SPIELERSTATUS:", {
+                    finished: me.finished,
+                    finishReason: me.finishReason,
+                    dice: me.dice
+                });
+                const available = me.availableFieldScores || [];
+                const used = me.usedScoreFields || [];
+
+                const availableByField = new Map(
+                    available.map(item => [normalizeField(item.field), item])
+                );
+
+                const usedFields = new Set(used.map(normalizeField));
+
+                container.innerHTML = scoreFieldOrder.map(([field, label]) => {
+                    const score = showPossibilities
+                        ? availableByField.get(field)
+                        : null;
+                    const isUsed = usedFields.has(field);
+                    const isAvailable = !!score && !isUsed && !me.finished;
+
+                    let points = showPossibilities && me.scoreFieldPoints?.[field] != null
+                        ? fmt(me.scoreFieldPoints[field])
+                        : '—';
+                    let description = '';
+
+                    if (score) {
+                        points = fmt(score.points);
+                        description = score.jokerExplanation
+                            ? `${score.combination} · ${score.jokerExplanation}`
+                            : score.combination;
+                    } else if (isUsed) {
+                        description = 'Bereits verwendet';
+                    } else if (!showPossibilities) {
+                        description = 'Würfel rollen …';
+                    } else {
+                        description = 'Mit diesem Wurf nicht möglich';
+                    }
+
+                    return `
+            <button
+                type="button"
+                class="score-tile ${isUsed ? 'used' : ''}"
+                data-score-field="${field}"
+                ${isAvailable ? '' : 'disabled'}
+                title="${escapeHtml(description)}"
+            >
+                ${escapeHtml(label)}
+                <b>${points}</b>
+                <small>${escapeHtml(description)}</small>
+                ${isUsed ? '<small>✓ Bereits gewertet</small>' : ''}
+            </button>
+        `;
+                }).join('');
+
+
+                container.onclick = async (event) => {
+                    const button = event.target instanceof Element
+                        ? event.target.closest('button[data-score-field]')
+                        : null;
+
+                    if (!button || button.disabled) return;
+
+                    if (!roomState || busy || roomState.me.finished)
+                        return;
+
+                    const field = button.dataset.scoreField;
+
+                    const current = roomState.me.availableFieldScores || [];
+
+                    if (!current.some(item =>
+                        normalizeField(item.field) === field
+                    )) return;
+
+                    // Würfel vor dem Serveraufruf sichern
+                    const dice = [...roomState.me.dice];
+
+                    const fiveOfKind =
+                        dice.length === 5 &&
+                        dice.every(value => value === dice[0]);
+
+                    // Wertung an den Server senden
+                    const result = await invokeAction(
+                        'Bank',
+                        roomState.me.turnId,
+                        roomState.me.rollNumber,
+                        field,
+                        newActionId()
+                    );
+
+                    // Konfetti nur bei fünf gleichen Würfeln
+                    // und erfolgreich angenommener Wertung
+                    if (fiveOfKind) {
+                        launchGoldenConfetti();
+                    }
+                };
+
+            }
+
+
+            function render() {
+                if (!roomState) return;
+                showGame();
+                const pub = roomState.public, me = roomState.me;
+                $('roomCodeLabel').textContent = pub.code;
+                $('modeLabel').textContent = pub.mode === 'Solo' ? 'Solo gegen Computer' : 'Online-Zweispieler';
+                $('roundLabel').textContent = pub.round;
+                $('targetLabel').textContent = fmt(pub.target);
+                $('roundScore').textContent = fmt(me.roundScore);
+                $('roundProgressText').textContent = `/ ${fmt(pub.target)}`;
+                $('totalScore').textContent = fmt(me.totalScore);
+                //$('bestScore').textContent = fmt(me.bestPossiblePoints);
+                //$('bestDescription').textContent = me.bestPossibleJokerUse
+                //    ? `${me.bestPossibleCombination} · ${me.bestPossibleJokerUse}`
+                //    : me.bestPossibleCombination;
+
+                renderScoreFields(me, !rollingAnimation);
+                $('rollInfo').textContent = `Wurf ${me.rollNumber}/3 · ${me.rerollsLeft} weitere Drehung(en) möglich`;
+                $('lastAction').textContent = me.lastCombination ? `Letzte Wertung: ${me.lastCombination} · ${fmt(me.lastAward)} Punkte` : '';
+                const target = pub.target || targetValues[pub.round - 1];
+                $('progress').style.width =
+                    `${Math.min(100, me.roundScore / target * 100)}%`;
+                $('timer').textContent = mmss(localRemaining(me.remainingSeconds));
+                
+                const targetReached = me.roundScore >= pub.target;
+                const finishFace = me.finished
+                    ? (targetReached ? '🏁' : '❌')
+                    : null;
+
+                $('diceBoard').innerHTML = me.dice.map((value, index) => {
+                    const symbol = rollingAnimation && !held[index]
+                        ? faces[Math.floor(Math.random() * faces.length)]
+                        : faces[value];
+
+                    const animationClass = rollingAnimation && !held[index]
+                        ? 'rolling'
+                        : casinoJustStopped && !held[index]
+                            ? 'stopping'
+                            : '';
+
+                    return `
+        <button class="die ${held[index] ? 'held' : ''} ${animationClass}"
+            data-index="${index}"
+            ${(me.finished || !pub.started || rollingAnimation) ? 'disabled' : ''}
+            aria-label="${held[index] ? 'Behalten' : 'Zum Behalten auswählen'}">
+            <span class="die-symbol">${finishFace || symbol}</span>
+            <small>${me.finished ? 'BEENDET' : held[index] ? 'BEHALTEN' : 'DREHEN'}</small>
+        </button>
+    `;
+                }).join('');
+
+                document.querySelectorAll('.die[data-index]').forEach(button => button.addEventListener('click', () => {
+                    if (!roomState || roomState.me.finished) return;
+                    const i = Number(button.dataset.index); held[i] = !held[i];
+                    button.classList.toggle('held', held[i]); button.querySelector('small').textContent = held[i] ? 'BEHALTEN' : 'DREHEN';
+                }));
+                const active = pub.started && !me.finished && !busy;
+
+                $('rerollBtn1').disabled = !active || me.reroll1Used;
+                $('rerollBtn2').disabled = !active || me.reroll2Used;
+                $('startBtn').disabled = !roomState.isOwner || pub.started || pub.players.length !== 2;
+                $('startBtn').classList.toggle('hidden', pub.mode === 'Solo' || pub.started);
+
+                $('targetReachedBanner').classList.toggle(
+                    'hidden',
+                    !targetReached || me.finished
+                );
+
+                $('finishBanner').classList.toggle('hidden', !me.finished);
+
+                if (me.finished) {
+                    $('finishIcon').textContent = targetReached ? '🏁' : '❌';
+
+                    $('finishText').textContent = targetReached
+                        ? `Runde beendet! Ziel erreicht. Zeitbonus ${fmt(me.roundBonus)} Punkte.`
+                        : me.finishReason === 'NoValidMoves'
+                            ? 'Keine gültige Wertung mehr – du wartest.'
+                            : 'Zeit abgelaufen – du wartest.';
+                }
+                if (!pub.started && pub.roundStartedAtUtc && pub.round === 5) $('roundMessage').textContent = 'Das Spiel ist beendet. Endstand siehe rechts.';
+                else if (!pub.started && !pub.roundStartedAtUtc) $('roundMessage').textContent = 'Warte auf den zweiten Spieler und den Start durch den Raumersteller.';
+                else $('roundMessage').textContent = 'Beide Spieler starten gleichzeitig. Jede Spielfläche hat eine eigene, serverseitige 3:30-Minuten-Uhr.';
+                renderPublic();
+            }
+
+            function localRemaining(serverSeconds) {
+                const elapsed = Math.floor((Date.now() - receivedAt) / 1000);
+                return Math.max(0, serverSeconds - elapsed);
+            }
+
+            function renderRoundScoreboard(pub, bothFinished) {
+                const box = $('roundScoreboard');
+                const container = $('roundScoreboardPlayers');
+
+                if (!bothFinished) {
+                    box.classList.add('hidden');
+
+                    if (roundScoreboardTimer) {
+                        clearInterval(roundScoreboardTimer);
+                        roundScoreboardTimer = null;
+                    }
+
+                    roundScoreboardKey = '';
+                    return;
+                }
+
+                box.classList.remove('hidden');
+
+                const key = `${pub.round}|` + pub.players.map(p =>
+                    `${p.name}:${p.totalScore}:${p.roundScore}:${p.roundBonus}`
+                ).join('|');
+
+                // Animation nicht bei jedem neuen Server-Update neu starten.
+                if (key === roundScoreboardKey) return;
+
+                roundScoreboardKey = key;
+
+                if (roundScoreboardTimer) {
+                    clearInterval(roundScoreboardTimer);
+                }
+
+                const rows = pub.players.map((p, index) => {
+                    const total = Number(p.totalScore || 0);
+                    const roundScore = Number(p.roundScore || 0);
+                    const bonus = Number(p.roundBonus || 0);
+
+                    // Der Zeitbonus steckt bereits in roundScore und totalScore.
+                    const previousTotal = total - roundScore;
+                    const normalRoundPoints = roundScore - bonus;
+
+                    return {
+                        index,
+                        name: p.name,
+                        remaining: Number(p.remainingSeconds || 0),
+                        previousTotal,
+                        normalRoundPoints,
+                        bonus,
+                        newTotal: total
+                    };
+                });
+
+                container.innerHTML = rows.map(row => `
+        <div class="round-score-row">
+            <b>${escapeHtml(row.name)}</b>
+
+            <div class="muted">
+                Restzeit beim Rundenende:
+                <b>${mmss(row.remaining)}</b>
+            </div>
+
+            <div class="round-score-equation">
+                <span>
+                    Bisher:
+                    <span class="round-score-value">
+                        ${fmt(row.previousTotal)}
+                    </span>
+                </span>
+
+                <span>
+                    + Runde:
+                    <span class="round-score-value">
+                        ${fmt(row.normalRoundPoints)}
+                    </span>
+                </span>
+
+                <span>
+                    + Zeitbonus:
+                    <span class="round-score-bonus" id="roundBonus${row.index}">
+                        0
+                    </span>
+                </span>
+
+                <span>
+                    = Gesamt:
+                    <span class="round-score-value" id="roundTotal${row.index}">
+                        ${fmt(row.previousTotal + row.normalRoundPoints)}
+                    </span>
+                </span>
+            </div>
+        </div>
+    `).join('');
+
+                // Zeitbonus sichtbar hochzählen.
+                const startTime = Date.now();
+                const duration = 1500;
+
+                roundScoreboardTimer = setInterval(() => {
+                    const progress = Math.min(
+                        1,
+                        (Date.now() - startTime) / duration
+                    );
+
+                    rows.forEach(row => {
+                        const animatedBonus = Math.floor(row.bonus * progress);
+
+                        const bonusElement = $(`roundBonus${row.index}`);
+                        const totalElement = $(`roundTotal${row.index}`);
+
+                        if (bonusElement) {
+                            bonusElement.textContent = fmt(animatedBonus);
+                        }
+
+                        if (totalElement) {
+                            totalElement.textContent = fmt(
+                                row.previousTotal +
+                                row.normalRoundPoints +
+                                animatedBonus
+                            );
+                        }
+                    });
+
+                    if (progress >= 1) {
+                        clearInterval(roundScoreboardTimer);
+                        roundScoreboardTimer = null;
+                    }
+                }, 30);
+            }
+
+            function renderPublic() {
+                if (!roomState) return;
+
+                const pub = roomState.public;
+                const me = roomState.me;
+                const myPublic = pub.players[roomState.myPlayerIndex];
+
+                const opponent = pub.players.find(
+                    (p, index) => index !== roomState.myPlayerIndex
+                );
+
+                $('opponentCards').innerHTML = pub.players.map((p, index) => {
+                    const isMe = index === roomState.myPlayerIndex;
+                    let status;
+
+                    if (p.finished && p.readyForNextRound) {
+                        status = '<span class="tag ok">Bereit ✓</span>';
+                    } else if (p.finished && opponent?.finished) {
+                        status = '<span class="tag">Wartet auf Bestätigung</span>';
+                    } else if (p.finished) {
+                        status = p.finishReason === 'TargetReached'
+                            ? '<span class="tag ok">Ziel erreicht 🏁</span>'
+                            : '<span class="tag bad">Beendet ❌</span>';
+                    } else if (!pub.started) {
+                        status = '<span class="tag">Wartet auf Start</span>';
+                    } else {
+                        status = '<span class="tag">Spielt</span>';
+                    }
+
+                    return `
+            <div class="player-card">
+                <div class="player-line">
+                    <span class="name">${escapeHtml(p.name)} ${isMe ? '(Du)' : ''}</span>
+                    ${status}
+                </div>
+                <div class="player-line">
+                    <span class="muted">Rundenpunkte</span>
+                    <b>${fmt(p.roundScore)}</b>
+                </div>
+                <div class="player-line">
+                    <span class="muted">Gesamt</span>
+                    <b class="big">${fmt(p.totalScore)}</b>
+                </div>
+                <div class="player-line">
+                     <span class="muted">Restzeit</span>
+                     <b class="opponent-timer">${mmss(localRemaining(p.remainingSeconds))}</b>
+                </div>
+                <div class="muted">
+                    ${p.isComputer ? 'Computergegner' : p.isConnected ? 'Verbunden' : 'Verbindung getrennt'}
+                </div>
+            </div>
+        `;
+                }).join('');
+
+                const nextRoundBox = $('nextRoundBox');
+                const nextRoundBtn = $('nextRoundBtn');
+
+                const bothFinished = me.finished && opponent?.finished && pub.started;
+
+                renderRoundScoreboard(pub, bothFinished);
+
+                nextRoundBox.classList.toggle('hidden', !bothFinished);
+
+                if (bothFinished) {
+                    const myReady = myPublic.readyForNextRound;
+                    const opponentReady = opponent.readyForNextRound;
+
+                    $('readyMessage').textContent =
+                        `Du: ${myReady ? 'Bereit ✓' : 'Noch nicht bereit'} | ` +
+                        `${opponent.name}: ${opponentReady ? 'Bereit ✓' : 'Wartet'}`;
+
+                    nextRoundBtn.disabled = myReady || busy;
+
+                    nextRoundBtn.textContent = myReady
+                        ? 'Du bist bereit – warte auf den Gegner'
+                        : 'Nächste Runde starten';
+                }
+
+                if (me.finished && opponent && !opponent.finished) {
+                    $('roundMessage').textContent =
+                        'Du hast deine Runde beendet. 🕒 Du wartest auf deinen Gegner.';
+                } else if (!me.finished && opponent?.finished) {
+                    $('roundMessage').textContent =
+                        'Dein Gegner ist fertig. Du kannst deine Runde noch beenden.';
+                } else if (bothFinished) {
+                    $('roundMessage').textContent =
+                        'Beide Spieler haben ihre Runde beendet. Bestätigt gemeinsam den Rundenwechsel.';
+                } else if (!pub.started && pub.round === 5) {
+                    $('roundMessage').textContent =
+                        'Das Spiel ist beendet. Endstand siehe rechts.';
+                } else {
+                    $('roundMessage').textContent =
+                        'Beide Spieler spielen gleichzeitig. Jeder hat seine eigene Zeit.';
+                }
+                // Endergebnis nach der fünften Runde anzeigen
+                const gameFinished =
+                    pub.round === 5 &&
+                    !pub.started &&
+                    !!pub.roundStartedAtUtc;
+
+                const finalBoard = $('finalScoreboard');
+
+                finalBoard.classList.toggle('hidden', !gameFinished);
+
+                const restartButton = $('restartGameBtn');
+                const restartHint = $('restartHint');
+
+                restartButton.disabled = !gameFinished || !roomState.isOwner || busy;
+
+                restartButton.textContent = roomState.isOwner
+                    ? '🔄 Erneut spielen'
+                    : 'Warte auf den Raumersteller';
+
+                restartHint.textContent = roomState.isOwner
+                    ? 'Du kannst eine neue Partie starten.'
+                    : 'Der Raumersteller kann eine neue Partie starten.';
+
+                if (gameFinished) {
+                    const players = [...pub.players].sort(
+                        (a, b) => b.totalScore - a.totalScore
+                    );
+
+                    const highestScore = players[0]?.totalScore ?? 0;
+                    const winners = players.filter(
+                        p => p.totalScore === highestScore
+                    );
+
+                    $('finalWinner').textContent =
+                        winners.length > 1
+                            ? '🤝 Unentschieden!'
+                            : `🥇 ${players[0].name} gewinnt!`;
+
+                    $('finalPlayers').innerHTML = players.map((p, index) => {
+                        const place = index === 0
+                            ? '🥇 1. Platz'
+                            : index === 1
+                                ? '🥈 2. Platz'
+                                : `Platz ${index + 1}`;
+
+                        return `
+                            <div class="final-player ${index === 0 ? 'first' : ''}">
+                                <span>${place} · ${escapeHtml(p.name)}</span>
+                                <b>${fmt(p.totalScore)} Punkte</b>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+
+            $('restartGameBtn').onclick = async () => {
+                if (
+                    busy ||
+                    !roomState ||
+                    !roomState.isOwner ||
+                    !credentials ||
+                    !connection
+                ) return;
+
+                busy = true;
+                $('restartGameBtn').disabled = true;
+
+                try {
+                    await connection.invoke(
+                        'RestartGame',
+                        credentials.code,
+                        credentials.token
+                    );
+
+                    setStatus('Eine neue Partie wurde gestartet!');
+                }
+                catch (e) {
+                    setStatus(e.message || 'Neustart fehlgeschlagen.');
+                }
+                finally {
+                    busy = false;
+
+                    if (roomState) render();
+                }
+            };
+
+            $('nextRoundBtn').onclick = async () => {
+                if (busy || !connection || !credentials) return;
+
+                busy = true;
+                $('nextRoundBtn').disabled = true;
+
+                try {
+                    await connection.invoke(
+                        'ConfirmNextRound',
+                        credentials.code,
+                        credentials.token
+                    );
+
+                    setStatus('Bereitschaft bestätigt.');
+                }
+
+                catch (e) {
+                    setStatus(e.message || String(e));
+                } 
+
+                finally {
+                    busy = false;
+                    if (roomState) render();
+                }
+            };
+
+            function launchGoldenConfetti() {
+                const layer = document.createElement('div');
+                layer.className = 'gold-confetti-layer';
+                document.body.appendChild(layer);
+
+                for (let i = 0; i < 100; i++) {
+                    const piece = document.createElement('span');
+                    piece.className = 'gold-confetti-piece';
+
+                    piece.style.left = Math.random() * 100 + 'vw';
+                    piece.style.animationDelay = Math.random() * 0.3 + 's';
+                    piece.style.animationDuration =
+                        (1.2 + Math.random() * 0.3) + 's';
+
+                    piece.style.background = [
+                        '#ffd700',
+                        '#ffec8b',
+                        '#daa520',
+                        '#fff4b0'
+                    ][Math.floor(Math.random() * 4)];
+
+                    piece.style.width = (5 + Math.random() * 7) + 'px';
+                    piece.style.height = (8 + Math.random() * 10) + 'px';
+
+                    layer.appendChild(piece);
+                }
+
+                setTimeout(() => layer.remove(), 1800);
+            }
+
+            function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+
+            async function invokeAction(method, ...args) {
+                if (busy) return null;
+                if (!connection || connection.state !== signalR.HubConnectionState.Connected || !credentials) return null;
+
+                busy = true;
+                $('rerollBtn1').disabled = true;
+                $('rerollBtn2').disabled = true;
+
+                document.querySelectorAll('[data-score-field]').forEach(button => {
+                    button.disabled = true;
+                });
+
+                try {
+                    const result = await connection.invoke(
+                        method,
+                        credentials.code,
+                        credentials.token,
+                        ...args
+                    );
+
+                    if (result && result.message) {
+                        $('lastAction').textContent = result.message;
+                    }
+
+                    setStatus(result?.message || 'Aktion übernommen.');
+                    return result;
+
+                } catch (e) {
+                    setStatus(e.message || String(e));
+                    return null;
+
+                } finally {
+                    busy = false;
+                    if (roomState) render();
+                }
+            }
+
+
+            $('soloBtn').onclick = async () => {
+                try { await leaveCurrentRoom(); const info = await connection.invoke('CreateSolo', $('playerName').value); saveCredentials(info); setStatus('Solo-Partie gegen den Computer gestartet.'); }
+                catch (e) { setStatus(e.message); }
+            };
+            $('createBtn').onclick = async () => {
+                try { await leaveCurrentRoom(); const info = await connection.invoke('CreateRoom', $('playerName').value); saveCredentials(info); setStatus('Raum erstellt. Teile den sechsstelligen Code mit deinem Mitspieler.'); }
+                catch (e) { setStatus(e.message); }
+            };
+            $('joinBtn').onclick = async () => {
+                try { await leaveCurrentRoom(); const info = await connection.invoke('JoinRoom', $('joinCode').value.trim().toUpperCase(), $('playerName').value); saveCredentials(info); setStatus('Beigetreten. Der Ersteller kann jetzt das Spiel starten.'); }
+                catch (e) { setStatus(e.message); }
+            };
+            $('startBtn').onclick = async () => {
+                if (!credentials) return;
+                try { await connection.invoke('StartGame', credentials.code, credentials.token); setStatus('Spiel gestartet.'); }
+                catch (e) { setStatus(e.message); }
+            };
+
+            async function performReroll(buttonNumber) {
+                if (!roomState || busy || rollingAnimation) return;
+
+                const button = buttonNumber === 1
+                    ? $('rerollBtn1')
+                    : $('rerollBtn2');
+
+                if (button.disabled) return;
+
+                await invokeAction(
+                    'Reroll',
+                    roomState.me.turnId,
+                    roomState.me.rollNumber,
+                    buttonNumber,
+                    held,
+                    newActionId()
+                );
+            }
+
+            $('rerollBtn1').onclick = () => performReroll(1);
+            $('rerollBtn2').onclick = () => performReroll(2);
+  
+            $('leaveBtn').onclick = async () => { await leaveCurrentRoom(); setStatus('Raum verlassen.'); };
+            setInterval(() => {
+                if (!roomState) return;
+                $('timer').textContent = mmss(localRemaining(roomState.me.remainingSeconds));
+                document.querySelectorAll('.player-card').forEach((card, index) => {
+                    const p = roomState.public.players[index];
+                    if (!p) return;
+
+                    const timer = card.querySelector('.opponent-timer');
+
+                    if (timer) {
+                        timer.textContent = mmss(localRemaining(p.remainingSeconds));
+                    }
+                });
+            }, 250);
+            connect().catch(e => setStatus('Verbindung fehlgeschlagen: ' + e.message));
+        })();
+    </script>
+</body>
+</html>

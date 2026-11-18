@@ -1,0 +1,8 @@
+ITCH.IO UPLOAD
+
+1. Trage in server-config.js die echte Render-HTTPS-Adresse ein:
+   window.PICKUP_SERVER_URL = "https://DEIN-SERVICE.onrender.com";
+2. Packe index.html und server-config.js gemeinsam in eine ZIP-Datei. Beide Dateien muessen direkt im ZIP-Hauptverzeichnis liegen.
+3. Lade die ZIP bei itch.io als HTML-Projekt hoch und aktiviere Browser-Playback.
+
+Die Render-Adresse gibt es erst nach dem ersten erfolgreichen Server-Deployment.
